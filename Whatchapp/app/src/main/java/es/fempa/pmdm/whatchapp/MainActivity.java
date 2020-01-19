@@ -13,7 +13,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
-
+ // EVENTS CLICK DE LOS DIFERENTES BOTONES DEL MAIN
     public void serverb(View v){
         Intent i = new Intent(this, ConfActivity.class);
         i.putExtra("tipo", "server");

@@ -2,6 +2,7 @@ package es.fempa.pmdm.whatchapp;
 
 public class Mensaje {
 
+     //CLASE MENSAJE ATRIBUTS Y CONECTORES
      String contenido;
      String autor;
      String fecha;

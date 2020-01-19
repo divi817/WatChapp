@@ -21,6 +21,7 @@ public class ConfActivity extends AppCompatActivity {
     Button btnconn;
     EditText etport;
     SendMens sm;
+    EditText etnom;
 
     @Override
       protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +32,9 @@ public class ConfActivity extends AppCompatActivity {
         etip = (EditText) findViewById(R.id.direccionEt);
         btnconn = (Button) findViewById(R.id.connBut);
         etport = (EditText) findViewById(R.id.portEt);
+        etnom = (EditText) findViewById(R.id.usuEt);
 
-        if(getIntent().getStringExtra("tipo") != ""){
+        if(getIntent().getStringExtra("tipo") != ""){ //CAMBIAMOS FORMULARIO PARA CLIENTE O SERVIIDOR
             if(getIntent().getStringExtra("tipo").equals("server")){
                 tvip.setVisibility(View.INVISIBLE);
                 etip.setVisibility(View.INVISIBLE);
@@ -59,50 +61,23 @@ public class ConfActivity extends AppCompatActivity {
     }
 
     public void connC(View v){
-        String p = etport.getText().toString();
+        String p = etport.getText().toString(); //OBTENEMOS DATOS Y ENVIAMOS EN EL INTENT
         String i = etip.getText().toString();
+        String n = etnom.getText().toString();
         Intent it = new Intent(this, ChatActivity.class);
         it.putExtra("puerto", p);
         it.putExtra("ip", i);
+        it.putExtra("nombre", n);
         startActivity(it);
     }
 
     public void connS(View v){
-        String p = etport.getText().toString();
+        String p = etport.getText().toString();//OBTENEMOS DATOS Y ENVIAMOS EN EL INTENT
+        String n = etnom.getText().toString();
         Intent it = new Intent(this, ChatActivity.class);
         it.putExtra("puerto", p);
-        it.putExtra("ip", getIpAddress());
+        it.putExtra("ip", "servidor");
+        it.putExtra("nombre", n);
         startActivity(it);
-    }
-
-    //Aqui obtenemos la IP de nuestro terminal
-    private String getIpAddress()
-    {
-        String ip = "";
-        try
-        {
-            Enumeration<NetworkInterface> enumNetworkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (enumNetworkInterfaces.hasMoreElements())
-            {
-                NetworkInterface networkInterface = enumNetworkInterfaces.nextElement();
-                Enumeration<InetAddress> enumInetAddress = networkInterface.getInetAddresses();
-                while (enumInetAddress.hasMoreElements())
-                {
-                    InetAddress inetAddress = enumInetAddress.nextElement();
-
-                    if (inetAddress.isSiteLocalAddress())
-                    {
-                        ip += "IP de Servidor: " + inetAddress.getHostAddress() + "\n";
-                    }
-
-                }
-            }
-        } catch (SocketException e)
-        {
-            e.printStackTrace();
-            ip += "¡Algo fue mal! " + e.toString() + "\n";
-        }
-
-        return ip;
     }
 }

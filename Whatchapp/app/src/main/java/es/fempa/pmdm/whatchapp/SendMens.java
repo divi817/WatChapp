@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 
 public class SendMens extends LinearLayout {
+    //Java del componente compuesto para enviar mensajes
     EditText et;
     Button btn;
 
@@ -22,13 +23,6 @@ public class SendMens extends LinearLayout {
 
         et = (EditText) findViewById(R.id.sendText);
         btn = (Button) findViewById(R.id.sendBtn);
-
-        btn.setOnClickListener(new Button.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                et.setText("");
-            }
-        });
     }
 
     public SendMens(Context context, @Nullable AttributeSet attrs) {
@@ -39,13 +33,6 @@ public class SendMens extends LinearLayout {
 
         et = (EditText) findViewById(R.id.sendText);
         btn = (Button) findViewById(R.id.sendBtn);
-
-        btn.setOnClickListener(new Button.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                et.setText("");
-            }
-        });
     }
 
 }

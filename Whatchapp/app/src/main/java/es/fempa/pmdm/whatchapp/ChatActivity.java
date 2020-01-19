@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,8 +18,12 @@ import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.sql.BatchUpdateException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,11 +49,15 @@ import java.util.ListIterator;
 import androidx.appcompat.app.AppCompatActivity;
 public class ChatActivity extends AppCompatActivity {
 
-    TextView myTV;
-    Button btncliente, btnservidor;
-    EditText ipServer;
+    String user, ip, puerto;
+    Boolean campos = false;
+
+    TextView ipTv;
+    SendMens sm;
+    EditText mensTxt;
     ListView ch;
-    TextView conn;
+    Button envBtn;
+
 
     List<Mensaje> mensajes;
     MensajeAdapter ma;
@@ -60,7 +69,7 @@ public class ChatActivity extends AppCompatActivity {
     DataInputStream dataInputStream;
     DataOutputStream dataOutputStream;
 
-    int mPuerto=1048;
+    int mPuerto=4444;
     //Hilo para escuchar los mensajes que le lleguen por el socket
     GetMessagesThread HiloEscucha;
 
@@ -68,20 +77,51 @@ public class ChatActivity extends AppCompatActivity {
     /*Variable para el servidor*/
     WaitingClientThread HiloEspera;
 
+
+    private void actualizar(){
+        ma = new MensajeAdapter(this, R.layout.mensaje_layout, mensajes);
+        ch.setAdapter(ma);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        sm = (SendMens) findViewById(R.id.enviarmensaje); //OBTENEMOS COMPONENTES
+        ipTv = (TextView) findViewById(R.id.ipText);
+        mensTxt = (EditText) findViewById(R.id.sendText);
+        envBtn = (Button) findViewById(R.id.sendBtn);
         ch = (ListView) findViewById(R.id.chat);
-
         mensajes = new ArrayList<Mensaje>();
-        for(int i =0; i<100; i++) {
-            mensajes.add(new Mensaje("Hola  sehhJHJJKWKJKJA JAFKJKAJKFJKA JIKFKJERAJKJKEJKDKJDKJDKJDKJD", "divi", "08/08/2011"));
+
+        envBtn.setOnClickListener(new View.OnClickListener() { //ACTIVAMOS ON CLICK DEL ENVIAR MENSAJE
+            @Override
+            public void onClick(View v) {
+                String s = mensTxt.getText().toString();
+                mensTxt.setText("");
+                sendMessage(s);
+            }
+        });
+
+        if(getIntent().getStringExtra("nombre") != "" && getIntent().getStringExtra("puerto") != "" &&
+        getIntent().getStringExtra("ip") != ""){
+            user = getIntent().getStringExtra("nombre");
+            ip = getIntent().getStringExtra("ip");
+            puerto = getIntent().getStringExtra("puerto");
+            mPuerto = Integer.parseInt(puerto); //OBTENEMOS DATOS DE LA OTRA ACTIVIDAD Y CONECTAMOS
+            if(ip.equals("servidor")){
+                startServer();
+            }
+            else{
+                startClient();
+            }
+            campos= true;
+        }
+        else{
+            finish();
         }
 
-        ma = new MensajeAdapter(this, R.layout.mensaje_layout, mensajes);
-        ch.setAdapter(ma);
 
 
 
@@ -89,24 +129,21 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void volver(View v){
+        ConectionEstablished=false;
         finish();
     }
 
-    public void startServer(View v)
+    public void startServer()
     {
-        SetText("\nComenzamos Servidor!");
+
         (HiloEspera=new WaitingClientThread()).start();
     }
 
-    public void startClient(View v)
+    public void startClient()
     {
-        String TheIP=ipServer.getText().toString();
-        if(TheIP.length()>5)
+        String TheIP=ip;
+        if(TheIP.length()>1)
         {
-            btncliente.setEnabled(false);
-            btnservidor.setEnabled(false);
-            ipServer.setEnabled(false);
-
             (new ClientConnectToServer(TheIP)).start();
 
             SetText("\nComenzamos Cliente!");
@@ -128,14 +165,29 @@ public class ChatActivity extends AppCompatActivity {
     {
         public void run()
         {
-            SetText("Esperando Usuario...");
+            //SetText("Esperando Usuario...");
             try
             {
                 //Abrimos el socket
-                serverSocket = new ServerSocket(mPuerto);
+
+                try {
+                    serverSocket = new ServerSocket(mPuerto);
+                } catch (IOException e) {
+                    Log.e("1","No puede escuchar en el puerto: " + mPuerto+e.toString());
+                    System.exit(-1);
+                }
 
                 //Mostramos un mensaje para indicar que estamos esperando en la direccion ip y el puerto...
-                AppenText("Creado el servidor\n Dirección: "+getIpAddress()+" Puerto: "+serverSocket.getLocalPort());
+                AppenText("Dirección: "+getIpAddress()+" Puerto: "+serverSocket.getLocalPort());
+                ip = getIpAddress();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        envBtn.setEnabled(false);
+                        mensTxt.setEnabled(false);
+                    }
+                });
+
 
                 //Creamos un socket que esta a la espera de una conexion de cliente
                 socket = serverSocket.accept();
@@ -147,7 +199,13 @@ public class ChatActivity extends AppCompatActivity {
                 }catch(Exception e){ e.printStackTrace();}
 
                 ConectionEstablished=true;
-
+                runOnUiThread(new Runnable() { // ACTIVAMOS ENVIAR MENSAJE
+                    @Override
+                    public void run() {
+                        envBtn.setEnabled(true);
+                        mensTxt.setEnabled(true);
+                    }
+                });
                 //Iniciamos el hilo para la escucha y procesado de mensajes
                 (HiloEscucha=new GetMessagesThread()).start();
 
@@ -170,9 +228,11 @@ public class ChatActivity extends AppCompatActivity {
         {
             //TODO Connect to server
             try {
-                SetText("Conectando con el servidor: " + mIp + ":" + mPuerto + "...\n\n");//Mostramos por la interfaz que nos hemos conectado al servidor} catch (IOException e) {
+                SetText("Conectando con el servidor: " + mIp);//Mostramos por la interfaz que nos hemos conectado al servidor
 
-                socket = new Socket(mIp, mPuerto);//Creamos el socket
+
+                    socket = new Socket(mIp, mPuerto);//Creamos el socket
+
 
                 try {
                     dataInputStream = new DataInputStream(socket.getInputStream());
@@ -188,6 +248,7 @@ public class ChatActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
                 AppenText("Error: " + e.getMessage());
+                finish();
             }
         }
 
@@ -228,9 +289,8 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 public void run()
                 {
-                    btncliente.setEnabled(true);
-                    btnservidor.setEnabled(true);
-                    ipServer.setEnabled(true);
+
+
                 }
             });
             ConectionEstablished = false;
@@ -301,12 +361,10 @@ public class ChatActivity extends AppCompatActivity {
             try
             {
                 dataOutputStream.writeUTF(msg);//Enviamos el mensaje
-                //dataOutputStream.close();
-                AppenText("Enviado: "+msg);
+
             }catch (IOException e)
             {
                 e.printStackTrace();
-                //message += "¡Algo fue mal! " + e.toString() + "\n";
             }
         }
     }
@@ -356,8 +414,12 @@ public class ChatActivity extends AppCompatActivity {
             {
                 line="";
                 line=ObtenerCadena();//Obtenemos la cadena del buffer
-                if(line!="" && line.length()!=0)//Comprobamos que esa cadena tenga contenido
-                    AppenText("Recibido: "+line);//Procesamos la cadena recibida
+                Date f = new Date(); //CREAMOS FORMATO DE FECHA
+                DateFormat hourdateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+                if(line!="" && line.length()!=0) {//Comprobamos que esa cadena tenga contenido
+                    mensajes.add(new Mensaje(line, user, hourdateFormat.format(f)));//Procesamos la cadena recibida
+                    actualizar();
+                }
             }
         }
 
@@ -385,14 +447,21 @@ public class ChatActivity extends AppCompatActivity {
     {
         private String text;
         public setUITextView(String text){this.text=text;}
-        public void run(){myTV.setText(text);}
+        public void run(){ipTv.setText(text);}
     }
 
     protected class appendUITextView implements Runnable
     {
         private String text;
         public appendUITextView(String text){this.text=text;}
-        public void run(){myTV.append(text);}
+        public void run(){ipTv.append(text);}
+    }
+
+    protected class actuView implements Runnable
+    {
+
+        public actuView(){}
+        public void run(){actualizar();}
     }
 
     @Override

@@ -46,15 +46,14 @@
                 android:id="@+id/ipText"
                 android:layout_width="291dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Conectado Servidor IP:" />
+                android:layout_weight="1" />
 
             <Button
                 android:id="@+id/volverBtn"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="#FAFF0027"
+                android:background="#F44336"
                 android:onClick="volver"
                 android:text="@string/volver"
                 android:textColor="#FCF7F6F6" />

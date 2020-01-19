@@ -11,8 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="88dp"
+        android:background="#8BC34A"
         android:ems="10"
-        android:hint="192.0.0.255..."
+        android:hint="192.168.1.38..."
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,19 +23,22 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
+        android:background="#8BC34A"
         android:text="@string/ip"
+        app:layout_constraintBottom_toTopOf="@+id/portEt"
         app:layout_constraintEnd_toStartOf="@+id/direccionEt"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/direccionEt" />
 
     <EditText
         android:id="@+id/portEt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="#8BC34A"
         android:ems="10"
-        android:hint="1024 o +"
+        android:hint="4444 recomendado"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,8 +48,10 @@
         android:id="@+id/connBut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="#8BC34A"
         android:onClick="connS"
         android:text="@string/conectar"
+        android:textColor="#030303"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.391"
@@ -56,19 +62,44 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="27dp"
+        android:background="#8BC34A"
         android:text="@string/puerto"
+        app:layout_constraintBottom_toTopOf="@+id/usuEt"
         app:layout_constraintEnd_toStartOf="@+id/portEt"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/direccionEt" />
 
     <Button
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="#F44336"
         android:onClick="volver"
         android:text="@string/volver"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/connBut"
+        app:layout_constraintTop_toBottomOf="@+id/portEt" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#8BC34A"
+        android:text="@string/user"
+        app:layout_constraintBottom_toBottomOf="@+id/usuEt"
+        app:layout_constraintEnd_toStartOf="@+id/usuEt"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/usuEt" />
+
+    <EditText
+        android:id="@+id/usuEt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#8BC34A"
+        android:ems="10"
+        android:hint="Introduzca nombre..."
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/portEt" />
 </androidx.constraintlayout.widget.ConstraintLayout>

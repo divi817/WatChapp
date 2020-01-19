@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Whatchapp</string>
+    <string name="conectar">Conectar</string>
+    <string name="puerto">Puerto</string>
+    <string name="ip">Direccion IP</string>
+    <string name="servidor">Servidor</string>
+    <string name="cliente">Cliente</string>
+    <string name="about">Acerca de</string>
+    <string name="volver">Volver</string>
+</resources>
